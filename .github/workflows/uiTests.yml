@@ -31,25 +31,13 @@ jobs:
           distribution: 'zulu'
           cache: gradle
           
-      - name: Navigate
-        run: |
-          cd ui/espresso/BasicSample/
-          pwd
-
-      - name: check
-        run: |
-          pwd
-          ls -la
-
       - name: Grant execute permission for gradlew
+        working-directory: ui/espresso/BasicSample
         run: chmod +x gradlew
 
       - name: Run Compose tests using Gradle Managed Device
-        run: ./gradlew nexusOneApi30DebugAndroidTest \
-          -Pandroid.testoptions.manageddevices.emulator.gpu=swiftshader_indirect \
-          -Pandroid.experimental.testOptions.managedDevices.emulator.showKernelLogging=true \
-          -Pandroid.experimental.testOptions.managedDevices.maxConcurrentDevices=1 \
-          -Pandroid.experimental.testOptions.managedDevices.setupTimeoutMinutes=180
+        working-directory: ui/espresso/BasicSample
+        run: ./gradlew nexusOneApi30DebugAndroidTest 
 
       - name: Upload Gradle Managed Device test results
         uses: actions/upload-artifact@v4
