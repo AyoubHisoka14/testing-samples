@@ -32,7 +32,9 @@ jobs:
           cache: gradle
           
       - name: Navigate
-        run: cd ui/espresso/BasicSample
+        run: |
+          cd ui/espresso/BasicSample
+          ls -d */
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
