@@ -43,15 +43,23 @@ jobs:
       - name: Fix SDK Permissions
         run: sudo chmod -R 777 $ANDROID_SDK_ROOT
 
+      - name: Clean Gradle Cache
+        working-directory: ui/espresso/BasicSample
+        run: ./gradlew clean
+
+      - name: Create AVD Manually
+        run: |
+          echo "no" | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/avdmanager create avd -n test_avd -k "system-images;android-30;aosp_atd;x86" --device "Nexus 5"
+
       - name: Grant execute permission for gradlew
         working-directory: ui/espresso/BasicSample
         run: chmod +x gradlew
 
-      - name: Run Compose tests using Gradle Managed Device
+      - name: Run UI Tests
         working-directory: ui/espresso/BasicSample
-        run: ./gradlew nexusOneApi30DebugAndroidTest 
+        run: ./gradlew connectedAndroidTest
 
-      - name: Upload Gradle Managed Device test results
+      - name: Upload Test Results
         uses: actions/upload-artifact@v4
         with:
           name: testResults
