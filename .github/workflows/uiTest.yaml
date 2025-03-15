@@ -1,0 +1,51 @@
+name: Android UI Tests with Gradle Managed Devices
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  run_GMD:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+
+    steps:
+      - name: navigate
+        run: cd ./ui/espresso/BasicSample
+        
+      - name: Enable KVM group permissions
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+          ls /dev/kvm
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'zulu'
+          cache: gradle
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Run Compose tests using Gradle Managed Device
+        run: ./gradlew nexusOneApi30DebugAndroidTest \
+          -Pandroid.testoptions.manageddevices.emulator.gpu=swiftshader_indirect \
+          -Pandroid.experimental.testOptions.managedDevices.emulator.showKernelLogging=true \
+          -Pandroid.experimental.testOptions.managedDevices.maxConcurrentDevices=1 \
+          -Pandroid.experimental.testOptions.managedDevices.setupTimeoutMinutes=180
+
+      - name: Upload Gradle Managed Device test results
+        uses: actions/upload-artifact@v4
+        with:
+          name: testResults
+          path: app/build/reports/androidTests/managedDevice/allDevices/index.html
