@@ -15,7 +15,7 @@ jobs:
 
     steps:
       - name: navigate
-        run: pwd
+        run: ls
         
       - name: Enable KVM group permissions
         run: |
