@@ -15,7 +15,7 @@ jobs:
 
     steps:
       - name: navigate
-        run: cd ./ui/espresso/BasicSample
+        run: pwd
         
       - name: Enable KVM group permissions
         run: |
