@@ -33,8 +33,8 @@ jobs:
           
       - name: Navigate
         run: |
-          cd ui/espresso/BasicSample
-          ls -d */
+          find . -name "gradlew"
+          pwd
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
