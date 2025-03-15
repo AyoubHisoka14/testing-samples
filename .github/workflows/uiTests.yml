@@ -32,9 +32,7 @@ jobs:
           cache: gradle
           
       - name: Navigate
-        run: |
-          find . -name "gradlew"
-          pwd
+        run: ls -la
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
