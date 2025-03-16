@@ -36,7 +36,7 @@ jobs:
         
       - name: Build project and run local and device tests
         working-directory: ui/espresso/BasicSample
-        run: ./gradlew nexusOneApi30DebugAndroidTest 
+        run: ./gradlew nexusOneApi30DebugAndroidTest -Pandroid.experimental.androidTest.numManagedDeviceShards=2
 
       - name: Upload test reports
         if: always()
