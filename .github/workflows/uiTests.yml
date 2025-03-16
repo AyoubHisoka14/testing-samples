@@ -34,6 +34,9 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
         
+  uiTests:
+    runs-on: ubuntu-latest
+    steps:     
       - name: Build project and run local and device tests
         working-directory: ui/espresso/BasicSample
         run: ./gradlew nexusOneApi30DebugAndroidTest -Pandroid.experimental.androidTest.numManagedDeviceShards=2
