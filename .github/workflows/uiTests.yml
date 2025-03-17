@@ -1,4 +1,4 @@
-name: Android UI Tests with Gradle Managed Devices
+name: Android UI Tests with Firebase Test Lab
 
 on:
   push:
@@ -12,22 +12,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3 
-
+      - uses: actions/checkout@v3
+      
       - name: Set Up Build Job
         run: echo Setting Up Build Job
-        
-  uiTests:
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - uses: actions/checkout@v3     
-      - name: Enable KVM group perms
-        run: |
-          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
-          sudo udevadm control --reload-rules
-          sudo udevadm trigger --name-match=kvm
-          ls /dev/kvm
         
       - name: Set Up JDK
         uses: actions/setup-java@v3
@@ -42,14 +30,45 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
         
-      - name: Run UI Tests
-        working-directory: ui/espresso/BasicSample
-        run: ./gradlew nexusOneApi30DebugAndroidTest -Pandroid.experimental.androidTest.numManagedDeviceShards=2
+      - name: Build App APK
+        run: ./gradlew assembleDebug
+        
+      - name: Build UI Test APK
+        run: ./gradlew assembleAndroidTest
+        
+      - name: Upload APKs as Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-apks
+          path: "**/app/build/outputs/apk/**/*.apk"
 
-      - name: Upload test reports
+  uiTests:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Download APKs
+        uses: actions/download-artifact@v4
+        with:
+          name: app-apks
+          path: ./apks
+
+      - name: Run UI Tests on Firebase Test Lab
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_CLOUD_KEY }}
+        run: |
+          gcloud auth activate-service-account --key-file=${{ secrets.GOOGLE_CLOUD_KEY }}
+          gcloud --quiet config set project ${{ secrets.TESTLAB_PROJECT_ID }}
+          gcloud firebase test android run \
+            --type instrumentation \
+            --app ./apks/app-debug.apk \
+            --test ./apks/app-debug-androidTest.apk \
+            --device model=Pixel3,version=30,locale=en,orientation=portrait
+
+      - name: Upload Firebase Test Results
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: test-reports
-          path: '**/app/build/reports/androidTests'
-
+          name: firebase-test-results
+          path: "testlab-results/"
