@@ -47,7 +47,7 @@ jobs:
       - name: Upload Test APK
         uses: actions/upload-artifact@v4
         with:
-          name: app-debug
+          name: app-debug-androidTest
           path: ui/espresso/BasicSample/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
 
   uiTests:
