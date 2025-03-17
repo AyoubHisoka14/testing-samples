@@ -65,13 +65,18 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: app-debug-androidTest
+          
+      - name: Login to Google Cloud
+        uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+        with:
+          version: '270.0.0'
+          service_account_key: ${{ secrets.GOOGLE_CLOUD_KEY }}
+
+      - name: Set current project
+        run: gcloud config set project ${{ secrets.TESTLAB_PROJECT_ID }}
 
       - name: Run UI Tests on Firebase Test Lab
-        env:
-          GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_CLOUD_KEY }}
         run: |
-          gcloud auth activate-service-account --key-file=${{ secrets.GOOGLE_CLOUD_KEY }}
-          gcloud --quiet config set project ${{ secrets.TESTLAB_PROJECT_ID }}
           gcloud firebase test android run \
             --type instrumentation \
             --app app-debug/app-debug.apk \
