@@ -66,11 +66,10 @@ jobs:
         with:
           name: app-debug-androidTest
           
-      - name: Login to Google Cloud
-        uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+      - name: Authenticate with Google Cloud
+        uses: google-github-actions/auth@v1
         with:
-          version: '270.0.0'
-          service_account_key: ${{ secrets.GOOGLE_CLOUD_KEY }}
+          credentials_json: ${{ secrets.GOOGLE_CLOUD_KEY }}
 
       - name: Set current project
         run: gcloud config set project ${{ secrets.TESTLAB_PROJECT_ID }}
