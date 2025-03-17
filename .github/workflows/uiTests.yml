@@ -31,16 +31,18 @@ jobs:
         uses: android-actions/setup-android@v3
         
       - name: Build App APK
+        working-directory: ui/espresso/BasicSample
         run: ./gradlew assembleDebug
         
       - name: Build UI Test APK
+        working-directory: ui/espresso/BasicSample
         run: ./gradlew assembleAndroidTest
         
       - name: Upload APKs as Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: app-apks
-          path: "**/app/build/outputs/apk/**/*.apk"
+          path: ui/espresso/BasicSample/app/build/outputs/apk/**/*.apk"
 
   uiTests:
     runs-on: ubuntu-latest
